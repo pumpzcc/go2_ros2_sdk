@@ -20,6 +20,11 @@ from torchvision.utils import draw_bounding_boxes
 
 Detection = collections.namedtuple("Detection", "label, bbox, score")
 
+qos = QoSProfile(
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    depth=10
+)
+
 class CocoDetectorNode(Node):
     """Detects COCO objects in image and publishes on ROS2.
 
@@ -40,7 +45,8 @@ class CocoDetectorNode(Node):
             Image,
             "/camera/image_raw",
             self.listener_callback,
-            10)
+            qos
+        )
         self.detected_objects_publisher = \
             self.create_publisher(Detection2DArray, "detected_objects", 10)
         if self.get_parameter('publish_annotated_image').get_parameter_value().bool_value:
